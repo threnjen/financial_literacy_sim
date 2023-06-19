@@ -26,78 +26,82 @@ class EmptyValues(Exception):
     pass
 
 
-def identify_friends() -> list:
-    friends = []
-    friends.append(input("Enter a close friend's first name: ").capitalize())
-    friends.append(input("Enter another close friend's first name: ").capitalize())
-    friends.append(input("Enter another close friend's first name (Last one!): ").capitalize())
-    return friends
+class CreateCharacter:
+    def __init__(self) -> None:
+        self.hobbies_list = HOBBIES.copy()
 
+    def identify_friends(self) -> list:
+        friends = []
+        friends.append(input("Enter a close friend's first name: ").capitalize())
+        friends.append(input("Enter another close friend's first name: ").capitalize())
+        friends.append(input("Enter another close friend's first name (Last one!): ").capitalize())
+        return friends
 
-def identify_interests() -> list:
-    print("\nNow we will define your interests! Press ENTER to continue.")
-    interests = []
-    i = 1
-    while i < 4:
-        hobby_item_no = 1
-        for item in HOBBIES:
-            print(f"{hobby_item_no}: {item}")
-            hobby_item_no += 1
-        try:
-            hobby = int(input("Enter NUMBER of most interesting hobby on list: ")[:2])
-        except:
-            print("Invalid number. Enter a numer. Please try again...\n")
-            continue
-        try:
-            interests.append(HOBBIES.pop(hobby - 1))
-        except:
-            print("Invalid selection. Number is off the list. Please try again...\n")
-            continue
-        i += 1
+    def identify_interests(self) -> list:
+        input("\nNow we will define your interests! Press ENTER to continue.")
+        interests = []
+        i = 1
+        while i < 4:
+            print("\n")
+            hobby_item_no = 1
+            for item in self.hobbies_list:
+                print(f"{hobby_item_no}: {item}")
+                hobby_item_no += 1
+            try:
+                hobby = int(input("\nEnter NUMBER of most interesting hobby on list: ")[:2])
+            except:
+                print("Invalid number. Enter a numer. Please try again...\n")
+                continue
+            try:
+                interests.append(self.hobbies_list.pop(hobby - 1))
+            except:
+                print("Invalid selection. Number is off the list. Please try again...\n")
+                continue
+            i += 1
 
-    return interests
+        return interests
 
+    def identify_disinterests(self):
+        input("\nNow we will establish your disinterests... Press ENTER to continue.")
+        disinterests = []
+        i = 1
 
-def identify_disinterests():
-    input("\nNow we will establish your disinterests... Press ENTER to continue.")
-    disinterests = []
-    i = 1
-    while i < 3:
-        hobby_item_no = 1
-        for item in HOBBIES:
-            print(f"{hobby_item_no}: {item}")
-            hobby_item_no += 1
-        try:
-            hobby = int(input("Enter NUMBER of LEAST interesting hobby on list: ")[:2])
-        except:
-            print("Invalid number. Enter a numer. Please try again...\n")
-            continue
-        try:
-            disinterests.append(HOBBIES.pop(hobby - 1))
-        except:
-            print("Invalid selection. Number is off the list. Please try again...\n")
-            continue
-        i += 1
+        while i < 3:
+            print("\n")
+            hobby_item_no = 1
+            for item in self.hobbies_list:
+                print(f"{hobby_item_no}: {item}")
+                hobby_item_no += 1
+            try:
+                hobby = int(input("\nEnter NUMBER of LEAST interesting hobby on list: ")[:2])
+            except:
+                print("Invalid number. Enter a numer. Please try again...\n")
+                continue
+            try:
+                disinterests.append(self.hobbies_list.pop(hobby - 1))
+            except:
+                print("Invalid selection. Number is off the list. Please try again...\n")
+                continue
+            i += 1
 
-    return disinterests
+        return disinterests
 
+    def create_character(self) -> dict:
+        print("Creating new character...")
 
-def create_character() -> dict:
-    print("Creating new character...")
+        character_data = {}
 
-    character_data = {}
+        character_data["name"] = input(
+            "Enter character first name. This will overwrite other saves with this name: "
+        ).capitalize()
 
-    character_data["name"] = input(
-        "Enter character first name. This will overwrite other saves with this name: "
-    ).capitalize()
+        character_data["friends"] = self.identify_friends()
 
-    character_data["friends"] = identify_friends()
+        character_data[f"interests"] = self.identify_interests()
 
-    character_data[f"interests"] = identify_interests()
+        character_data[f"disinterests"] = self.identify_disinterests()
 
-    character_data[f"disinterests"] = identify_disinterests()
-
-    return character_data
+        return character_data
 
 
 if __name__ == "__main__":
@@ -129,10 +133,10 @@ if __name__ == "__main__":
             character = False
 
     while not character:
-        character_data = create_character()
+        character_data = CreateCharacter().create_character()
 
         confirmation = input(
-            f"Here's the character you created: {character_data}. Type SAVE to save, or REDO to remake: "
+            f"Here's the character you created: {character_data}.\nType SAVE to save, QUIT to quit, or press any other key to remake: "
         )
 
         if confirmation == "SAVE":
@@ -143,9 +147,8 @@ if __name__ == "__main__":
                 outfile.write(json_object)
 
             character = True
-        elif confirmation == "REDO":
-            continue
-        else:
-            continue
+        if confirmation == "QUIT":
+            print("Exiting without save")
+            quit()
 
     character = Character(character_data)
